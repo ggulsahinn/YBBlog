@@ -1,0 +1,76 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+<div class="jumbotron text-center">
+    <h3>Yazılım Bilimi Bloğuma Hoşgeldiniz</h3>
+    <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Esse quos ducimus, suscipit repellat at reiciendis
+        ratione adipisci provident, accusamus ex voluptate alias fugiat commodi voluptatibus in culpa obcaecati deleniti
+        odit.</p>
+</div>
+
+<!-- {% if islem==1 %}
+<p>1. işlem</p>
+
+{% elif islem==2 %}
+<p>2. işlem</p>
+  
+{% else %}
+<p>Geçersiz işlem.</p>
+
+{% endif %} -->
+
+<ul>
+    {% for i in articles %}
+        <li>Article Id: {{i.id}} - Title: {{i.title}} - Content: {{i.content}}</li>
+    {% endfor %}
+</ul>
+
+
+{% endblock body %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anasayfa</title>
+</head>
+
+<body>
+
+    <h3>Anasayfa</h3>
+
+    <h5>Sayı</h5>
+    <p>{{number}}</p>
+    <h5>Sayı 2</h5>
+    <p>{{number2}}</p>
+
+    <p>{{article["title"]}}</p>
+    <p>{{article["body"]}}</p>
+    <p>{{article["author"]}}</p>
+    
+    
+    <p>{{article.title}}</p>
+    <p>{{article.body}}</p>
+    <p>{{article.author}}</p>
+
+
+</body>
+
+</html> -->
