@@ -1,7 +1,21 @@
+from sqlite3 import Cursor
+from sre_constants import SUCCESS
+from click import confirm
 from flask import Flask, render_template,flash,redirect,url_for,session,logging,request
 from flask_mysqldb import MySQL
-from wtforms import From,StringField,TextAreaField,PasswordField,validators
+from wtforms import Form,StringField,TextAreaField,PasswordField,validators
 from passlib.hash import sha256_crypt
+
+#Kulllanıcı Kayıt Formu
+class RegisterForm(Form):
+    name = StringField("Ad Soyad", validators=[validators.Length(min=4,max=25)])
+    username = StringField("Kullanıcı Adı", validators=[validators.Length(min=5,max=35)])
+    email = StringField("Email Adresi", validators=[validators.Email(message="Lütfen geçerli bir email giriniz.")])
+    password = PasswordField("Parola", validators=[
+        validators.DataRequired(message="Lütfen bir parola giriniz."),
+        validators.EqualTo(fieldname="confirm", message="Parolanız uyuşmuyor!")
+    ])
+    confirm = PasswordField("Parola Doğrula")
 
 app = Flask(__name__)
 app.config["MYSQL_HOST"] =  "localhost"
@@ -39,11 +53,36 @@ def index():
 
 @app.route("/about")
 def about():
-    return render_template("about.html") #Dinamik URL
+    return render_template("about.html") 
 
-@app.route("/article/<string:id>")
+@app.route("/article/<string:id>") #Dinamik URL
 def detail(id):
     return "Article Id: "+id
+
+#Kayıt olma
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    form = RegisterForm(request.form)
+    if request.method=="POST" and form.validate():
+        name = form.name.data
+        username = form.username.data
+        email = form.email.data
+        password = sha256_crypt.encrypt(form.password.data)
+        confirm = form.confirm.data
+        
+        cursor = mysql.connection.cursor()        
+        sorgu = "Insert into users(name,username,email,password) VALUES(%s, %s, %s, %s)"
+        cursor.execute(sorgu,(name,username,email,password))
+        mysql.connection.commit()
+        cursor.close()
+        
+        flash("Başarıyla kayıt oldunuz...", SUCCESS)
+        
+        return redirect(url_for("index")) #gitmek istediğin sayfanın fonksiyon adını ver
+    else :
+        return render_template("register.html", form=form)
+
+
 
 
 
