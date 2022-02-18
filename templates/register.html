@@ -1,17 +1,30 @@
 {% extends "layout.html" %}
-
 {% block body %}
 {% from "includes/_formhelpers.html" import render_field %}
 <h3>Kayıt Olun</h3>
 <hr>
-<form method="post">
-    {{ render_field(form.name, class = "form-control w-25") }}
-    {{ render_field(form.username, class = "form-control w-25") }}
-    {{ render_field(form.email, class = "form-control w-25") }}
-    {{ render_field(form.password, class = "form-control w-25") }}
-    {{ render_field(form.confirm, class = "form-control w-25") }}
-    <button type="submit" class="btn btn-primary">Kayıt Ol</button>
+<form action="{{url_for('dashboard')}}" method="POST">
+    <div class="col-md-12">
+        <div class="w-25">
+            <label for="validationServer01">Ad Soyad</label>
+            <input name="name" type="text" class="form-control" id="validationServer01" placeholder="Ad Soyad" required>
+        </div>
+        <div class="w-25 mt-3">
+            <label for="validationServer01">Kullanıcı Adı</label>
+            <input name="username" type="text" class="form-control" id="validationServer01" placeholder="Kullanıcı Adı" required>
+        </div>
+        <div class="form-group w-25 mt-3">
+            <label for="exampleInputEmail1">Email</label>
+            <input type="email" class="form-control" id="exampleInputEmail1" placeholder="email@example.com"
+                name="email" required>
+        </div>
+        <div class="form-group w-25">
+            <label for="exampleInputPassword1">Parola</label>
+            <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Parola" name="password"
+                required>
+        </div>
+        <br>
+        <button class="btn btn-primary" type="submit">Kayıt Ol</button>
+    </div>
 </form>
-
-
 {% endblock body %}

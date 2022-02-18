@@ -1,39 +1,24 @@
-from sqlite3 import Cursor
-from sre_constants import SUCCESS
-from click import confirm
-from flask import Flask, render_template,flash,redirect,url_for,session,logging,request
-from flask_mysqldb import MySQL
-from wtforms import Form,StringField,TextAreaField,PasswordField,validators
-from passlib.hash import sha256_crypt
+from flask import Flask, render_template, flash, redirect, url_for, session, logging, request, Response, jsonify
+import firebase_admin
+from firebase_admin import credentials, firestore
+from datetime import datetime
 
-#Kulllanıcı Kayıt Formu
-class RegisterForm(Form):
-    name = StringField("Ad Soyad", validators=[validators.Length(min=4,max=25)])
-    username = StringField("Kullanıcı Adı", validators=[validators.Length(min=5,max=35)])
-    email = StringField("Email Adresi", validators=[validators.Email(message="Lütfen geçerli bir email giriniz.")])
-    password = PasswordField("Parola", validators=[
-        validators.DataRequired(message="Lütfen bir parola giriniz."),
-        validators.EqualTo(fieldname="confirm", message="Parolanız uyuşmuyor!")
-    ])
-    confirm = PasswordField("Parola Doğrula")
+cred = credentials.Certificate(
+    "ybblog-506ca-firebase-adminsdk-rr5mm-4c893a30b7.json")
+firebase_admin.initialize_app(cred)
+db = firestore.client()
 
 app = Flask(__name__)
-app.config["MYSQL_HOST"] =  "localhost"
-app.config["MYSQL_USER"] =  "root"
-app.config["MYSQL_PASSWORD"] =  ""
-app.config["MYSQL_DB"] =  "ybblog"
-app.config["MYSQL_CURSORCLASS"] =  "DictCursor"
+app.secret_key = "ybblog"  # flash mesajları gözükmesi için
+#app.config['SECRET_KEY'] = 'kmakmakma'
 
-mysql = MySQL(app)
-
-""" 
+"""
 @app.route("/")
 def index():
-    
     sayi=10
     sayi2=20
     return render_template("index.html",number=sayi,number2=sayi2)
-    
+
     article = dict()
     article["title"] = "Deneme"
     article["body"] = "Deneme 123"
@@ -41,46 +26,95 @@ def index():
     return render_template("index.html",article=article)
 """
 
+
 @app.route("/")
 def index():
-    articles = [
-        {"id":1 , "title":"Deneme1", "content":"Deneme1 içerik"},
-        {"id":2 , "title":"Deneme2", "content":"Deneme2 içerik"},
-        {"id":3 , "title":"Deneme3", "content":"Deneme3 içerik"}
-    ]
-    
-    return render_template("index.html",articles=articles)
+    return render_template("index.html")
+
+    # articles = [
+    #     {"id":1 , "title":"Deneme1", "content":"Deneme1 içerik"},
+    #     {"id":2 , "title":"Deneme2", "content":"Deneme2 içerik"},
+    #     {"id":3 , "title":"Deneme3", "content":"Deneme3 içerik"}]
+    # return render_template("index.html",articles=articles)
+
 
 @app.route("/about")
 def about():
-    return render_template("about.html") 
+    return render_template("about.html")
 
-@app.route("/article/<string:id>") #Dinamik URL
+@app.route("/dashboard")
+def dashboard():
+    return render_template("dashboard.html")
+
+
+@app.route("/article/<string:id>")  # Dinamik URL
 def detail(id):
     return "Article Id: "+id
 
-#Kayıt olma
+
+
 @app.route("/register", methods=["GET", "POST"])
 def register():
-    form = RegisterForm(request.form)
-    if request.method=="POST" and form.validate():
-        name = form.name.data
-        username = form.username.data
-        email = form.email.data
-        password = sha256_crypt.encrypt(form.password.data)
-        confirm = form.confirm.data
-        
-        cursor = mysql.connection.cursor()        
-        sorgu = "Insert into users(name,username,email,password) VALUES(%s, %s, %s, %s)"
-        cursor.execute(sorgu,(name,username,email,password))
-        mysql.connection.commit()
-        cursor.close()
-        
-        flash("Başarıyla kayıt oldunuz...", SUCCESS)
-        
-        return redirect(url_for("index")) #gitmek istediğin sayfanın fonksiyon adını ver
-    else :
-        return render_template("register.html", form=form)
+    if request.method == "POST":
+        name = request.form["name"]
+        username = request.form["username"]
+        email = request.form["email"]
+        password = request.form["password"]
+        kayityolu = db.collection("users").document()
+        kayityolu.set({
+            "name":name,
+            "username":username,
+            "email":email,
+            "password":password,
+            "key":kayityolu.id,
+            "date":datetime.now()
+        })
+        flash("Başarıyla kayıt oldunuz...", "success")    
+        return redirect(url_for("login")) #gitmek istediğin sayfanın fonksiyon adını ver
+    kayityolu = db.collection("users")
+    gelenveri = [doc.to_dict() for doc in kayityolu.stream()]
+    return render_template("register.html", gelenveri=gelenveri)
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+        kayityolu = db.collection("login").document()
+        kayityolu.set({
+            "username":username,
+            "password":password,
+            "key":kayityolu.id,
+            "date":datetime.now()
+        })
+        result=len(kayityolu["username"])
+        if result>0:
+            data = kayityolu.fetchone()
+            if data["password"]==kayityolu["password"]:
+                flash("Giriş Yapıldı", "success")
+                
+                session["logged_in"] = True
+                session["username"] = username
+                                
+                return redirect(url_for("index"))
+            else:
+                flash("Parola hatalı", "danger")
+                return redirect(url_for("login"))
+            
+        else:
+            flash("Böyle bir kullanıcı bulunmuyor!", "danger")
+            return redirect(url_for("login"))
+    kayityolu = db.collection("login")
+    gelenveri = [doc.to_dict() for doc in kayityolu.stream()]
+    return render_template("login.html", gelenveri=gelenveri)
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("index"))
+
+
 
 
 
