@@ -17,14 +17,14 @@
 
     <ul class="navbar-nav ml-auto">
 
-      {% if session["logged_in"] %}
+      {% if session["username"] != not %}
       <li class="nav-item">
-        <a class="nav-link {{aktif}}" href="/dashboard">Kontrol Paneli</a>
+        <a class="nav-link {{aktif}}" href="/dashboard"> {{session['username']}} Kontrol Paneli</a>
       </li>
       <li class="nav-item">
         <a class="nav-link {{aktif}}" href="/logout">Çıkış Yap</a>
       </li>
-      {% else %}
+      {% elif session["username"] == not %}
       <li class="nav-item">
         <a class="nav-link {{aktif}}" href="/login">Giriş Yap</a>
       </li>
