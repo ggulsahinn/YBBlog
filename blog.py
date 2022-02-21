@@ -1,8 +1,11 @@
+import re
 from flask import Flask, render_template, flash, redirect, url_for, session, logging, request, Response, jsonify
 import firebase_admin
 from firebase_admin import credentials, firestore
 from datetime import datetime
 from flask_session import Session
+from functools import wraps
+from flask_ckeditor import CKEditor
 
 cred = credentials.Certificate(
     "ybblog-506ca-firebase-adminsdk-rr5mm-4c893a30b7.json")
@@ -10,27 +13,25 @@ pb = firebase_admin.initialize_app(cred)
 db = firestore.client()
 
 app = Flask(__name__)
-app.secret_key = "ybblog"# flash mesajları gözükmesi için
+app.secret_key = "ybblog" # flash mesajları gözükmesi için
 # app.config['SECRET_KEY'] = 'kmakmakma'
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
+app.config['CKEDITOR_PKG_TYPE'] = 'basic'
+ckeditor = CKEditor(app)
 
+#Kullanıcı Giriş Decorator'ı
 
-"""
-@app.route("/")
-def index():
-    sayi=10
-    sayi2=20
-    return render_template("index.html",number=sayi,number2=sayi2)
-
-    article = dict()
-    article["title"] = "Deneme"
-    article["body"] = "Deneme 123"
-    article["author"] = "Gülşah"
-    return render_template("index.html",article=article)
-"""
-
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if "logged_in" in session:
+            return f(*args, **kwargs)
+        else:
+            flash("Bu sayfayı görüntülemek için lütfen giriş yapınız.", "danger")
+            return redirect(url_for("login"))
+    return decorated_function
 
 @app.route("/")
 def index():
@@ -39,19 +40,13 @@ def index():
     print(len(all_users))
     return render_template("index.html")
 
-    # articles = [
-    #     {"id":1 , "title":"Deneme1", "content":"Deneme1 içerik"},
-    #     {"id":2 , "title":"Deneme2", "content":"Deneme2 içerik"},
-    #     {"id":3 , "title":"Deneme3", "content":"Deneme3 içerik"}]
-    # return render_template("index.html",articles=articles)
-
-
 @app.route("/about")
 def about():
     return render_template("about.html")
 
 
 @app.route("/dashboard", methods=["GET", "POST"])
+@login_required
 def dashboard():
     return render_template("dashboard.html")
 
@@ -59,7 +54,6 @@ def dashboard():
 @app.route("/article/<string:id>")  # Dinamik URL
 def detail(id):
     return "Article Id: "+id
-
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -89,7 +83,7 @@ def register():
 def login():
     error = None
     if request.method == "POST":
-        #Forma girilen veriler alındı.
+        #form a girilen veriler alındı.
         username = request.form["username"]
         password = request.form["password"]
         
@@ -107,6 +101,7 @@ def login():
                 #formdan gelen password ile kullanıcının veri tabanından gelen passwordu karşılaştırıldı
                 if password == dbpassword:
                     #giriş başarılı ise session a username atandı
+                    session["logged_in"] = True
                     session["username"] = username
                     flash("Başarıyla giriş yaptınız...", "success")
                     return redirect(url_for("index"))
@@ -119,17 +114,34 @@ def login():
 
     return render_template('login.html', error=error)
 
-
-@app.route("/_formhelpers", methods=["GET", "POST"])
-def formhelpers():
-    return render_template("_formhelpers.html")
-
+@app.route("/addarticle", methods=["GET", "POST"])
+def addarticle():
+    if request.method == "POST":
+        title = request.form["title"]
+        author = request.form["author"]
+        content = request.form["content"]
+        kayityolu = db.collection("articles").document()
+        kayityolu.set({
+            "id": id,
+            "title": title,
+            "author": author,
+            "content": content,
+            "key": kayityolu.id,
+            "date": datetime.now()
+        })
+        return redirect(url_for(addarticle))
+    kayit = db.collection("articles")
+    gelenveri = [doc.to_dict() for doc in kayit.stream()]
+    return render_template("addarticle.html", gelenveri=gelenveri)
 
 @app.route("/logout")
 def logout():
     session.clear()
     return redirect(url_for("index"))
 
+@app.route("/_formhelpers", methods=["GET", "POST"])
+def formhelpers():
+    return render_template("_formhelpers.html")
 
 if __name__ == "__main__":
     app.run(debug=True)

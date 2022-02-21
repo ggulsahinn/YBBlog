@@ -8,10 +8,10 @@
 
     <ul class="navbar-nav mr-auto">
       <li class="nav-item">
-        <a class="nav-link {{aktif}}" href="/about">Hakkımızda </a>
+        <a class="nav-link" href="/about">Hakkımızda </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link {{aktif}}" href="/articles">Makaleler </a>
+        <a class="nav-link" href="/articles">Makaleler </a>
       </li>
     </ul>
 
@@ -19,17 +19,17 @@
 
       {% if session["username"] != not %}
       <li class="nav-item">
-        <a class="nav-link {{aktif}}" href="/dashboard"> {{session['username']}} Kontrol Paneli</a>
+        <a class="nav-link" href="/dashboard"> {{session['username'].capitalize()}} Kontrol Paneli</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link {{aktif}}" href="/logout">Çıkış Yap</a>
+        <a class="nav-link" href="/logout">Çıkış Yap</a>
       </li>
       {% elif session["username"] == not %}
       <li class="nav-item">
-        <a class="nav-link {{aktif}}" href="/login">Giriş Yap</a>
+        <a class="nav-link" href="/login">Giriş Yap</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link {{aktif}}" href="/register">Kayıt Olun</a>
+        <a class="nav-link" href="/register">Kayıt Olun</a>
       </li>
       {% endif %}
 

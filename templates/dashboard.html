@@ -1,8 +1,7 @@
 {% extends "layout.html" %}
 {% block body %}
 <h3>Kontrol Paneli</h3>
-<!-- <small>Hoş geldin, {{session["username"]}}</small> -->
-<small>Hoş geldin, {{name}}</small>
+<p class="light">Hoş geldin, {{session["username"].capitalize()}}</p>
 <hr>
-<!-- <form action="{{url_for('register')}}" method="POST">
- -->{% endblock body %}
+<a href="/addarticle" class="btn btn-danger">Makale Ekle</a>
+{% endblock body %}

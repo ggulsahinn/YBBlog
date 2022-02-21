@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block body %}
+<h3>Makale Oluştur</h3>
+<hr>
+{% from "includes/_formhelpers.html" import render_field %}
+<form action="{{url_for('addarticle')}}" method="POST">
+    <div class="col-md-12">
+        <div class="form-group mt-3">
+            <label for="validationServer01">Başlık</label>
+            <input type="text" class="form-control" name="title" id="validationServer01" placeholder="Başlık" required>
+        </div>
+        <div class="form-group mt-3">
+            <label for="exampleInputPassword1">Yazar</label>
+            <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Yazar" name="author"
+                required>
+        </div>
+        <div class="form-group mt-3">
+            <label for="exampleInputPassword1">İçerik</label>
+            {{ ckeditor.create() }}
+        </div>
+        <button class="btn btn-primary" type="submit">Ekle</button>
+    </div>
+</form>
+<script src="https://cdn.ckeditor.com/4.16.1/standard/ckeditor.js"></script>
+{% endblock body %}
