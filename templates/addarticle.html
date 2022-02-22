@@ -10,13 +10,12 @@
             <input type="text" class="form-control" name="title" id="validationServer01" placeholder="Başlık" required>
         </div>
         <div class="form-group mt-3">
-            <label for="exampleInputPassword1">Yazar</label>
-            <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Yazar" name="author"
-                required>
+            <label for="validationServer02">Yazar</label>
+            <input type="text" class="form-control" id="validationServer02" placeholder="Yazar" name="author" required>
         </div>
         <div class="form-group mt-3">
-            <label for="exampleInputPassword1">İçerik</label>
-            {{ ckeditor.create() }}
+            <label>İçerik</label>
+            {{ckeditor.create(name='content')}}
         </div>
         <button class="btn btn-primary" type="submit">Ekle</button>
     </div>
