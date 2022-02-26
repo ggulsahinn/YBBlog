@@ -51,6 +51,7 @@ def dashboard():
 
 
 @app.route("/articles", methods=["GET", "POST"])
+@login_required
 def articles():
     article = db.collection("articles")
     all_article = [doc.to_dict() for doc in article.stream()]
@@ -96,18 +97,15 @@ def login():
         # form a girilen veriler alındı.
         username = request.form["username"]
         password = request.form["password"]
-
         # veri tabanından bütün kullanıcılar çekildi
         users = db.collection("users")
         all_users = [doc.to_dict() for doc in users.stream()]
-
         # veri tabanından gelen kullanıcılar kadar for döngüsü döndürülüp her kullanıcı x değerine atandı
         for x in all_users:
             # veritabanından gelen kullanıcılar arasında forma girilen kullanıcı adına sahip biri varmı kontrol edildi
             if username == x['username']:
                 # kullanıcı adı mevcut ise parolası dbpassword değişkenine atandı
                 dbpassword = x['password']
-
                 # formdan gelen password ile kullanıcının veri tabanından gelen passwordu karşılaştırıldı
                 if password == dbpassword:
                     # giriş başarılı ise session a username atandı
@@ -118,14 +116,15 @@ def login():
                 else:
                     flash("Şifreniz yanlış...", "danger")
                     return redirect(url_for("login"))
-            else:
-                flash("Böyle bir kullanıcı bulunamadı...", "danger")
-                return redirect(url_for("login"))
+        else:
+            flash("Böyle bir kullanıcı bulunamadı...", "danger")
+            return redirect(url_for("login"))
 
     return render_template('login.html', error=error)
 
 
 @app.route("/addarticle", methods=["GET", "POST"])
+@login_required
 def addarticle():
     if request.method == "POST":
         title = request.form["title"]
