@@ -3,5 +3,10 @@
 <h3>Kontrol Paneli</h3>
 <p class="light">Hoş geldin, {{session["username"].capitalize()}}</p>
 <hr>
-<a href="/addarticle" class="btn btn-danger">Makale Ekle</a>
+<!-- <a href="/addarticle"><button type="button" class="btn btn-danger">Makale Ekle</button></a> -->
+<form action="{{url_for('addarticle')}}" method="POST"></form>
+{% for x in gelenveri %}
+<a href="/addarticle/{{x.key}}"><button type="button" class="btn btn-danger">Makale Ekle</button></a>
+{% endfor %}
+</form>
 {% endblock body %}

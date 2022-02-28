@@ -22,7 +22,6 @@ ckeditor = CKEditor(app)
 
 # Kullanıcı Giriş Decorator'ı
 
-
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -50,20 +49,15 @@ def dashboard():
     return render_template("dashboard.html")
 
 
-@app.route("/articles", methods=["GET", "POST"])
+@app.route("/articles/<string:key>", methods=["GET", "POST"])
 @login_required
-def articles():
-    article = db.collection("articles")
-    all_article = [doc.to_dict() for doc in article.stream()]
+def articles(key):  
+    kayit = db.collection("users").document(key).collection("articles").document().get()
+    all_article = [doc.to_dict() for doc in kayit.stream()]
     if len(all_article) > 0:
         return render_template("articles.html", all_article=all_article)
     else:
         return render_template("articles.html")
-
-
-@app.route("/article/<string:id>")  # Dinamik URL
-def detail(id):
-    return "Article Id: "+id
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -123,14 +117,14 @@ def login():
     return render_template('login.html', error=error)
 
 
-@app.route("/addarticle", methods=["GET", "POST"])
+@app.route("/addarticle/<string:key>", methods=["GET", "POST"])
 @login_required
-def addarticle():
+def addarticle(key):
     if request.method == "POST":
         title = request.form["title"]
         author = request.form["author"]
         content = request.form["content"]
-        kayityolu = db.collection("articles").document()
+        kayityolu = db.collection("users").document(key).collection("articles").document()
         kayityolu.set({
             "title": title,
             "author": author,
@@ -138,8 +132,8 @@ def addarticle():
             "key": kayityolu.id,
             "date": datetime.now()
         })
-        return redirect(url_for("addarticle"))
-    kayit = db.collection("articles")
+        return redirect(url_for("addarticle"))   
+    kayit = db.collection("users").document(key).collection("articles")
     gelenveri = [doc.to_dict() for doc in kayit.stream()]
     return render_template("addarticle.html", gelenveri=gelenveri)
 

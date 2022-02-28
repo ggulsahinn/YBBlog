@@ -9,36 +9,12 @@
         odit.</p>
 </div>
 
-<!-- {% if islem==1 %}
-<p>1. işlem</p>
-
-{% elif islem==2 %}
-<p>2. işlem</p>
-  
-{% else %}
-<p>Geçersiz işlem.</p>
-
-{% endif %} -->
-
 <ul>
     {% for i in articles %}
-        <li>Article Id: {{i.id}} - Title: {{i.title}} - Content: {{i.content}}</li>
+        <li>Article Key: {{i.key}} - Title: {{i.title}} - Content: {{i.content}}</li>
     {% endfor %}
 </ul>
-
-
 {% endblock body %}
-
-
-
-
-
-
-
-
-
-
-
 
 
 
