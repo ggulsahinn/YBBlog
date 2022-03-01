@@ -2,13 +2,32 @@
 {% block body %}
 <h3>Kontrol Paneli</h3>
 <p class="light">Hoş geldin, {{session["username"].capitalize()}}</p>
-<hr>
+
 {% if all_article %}
-<ul class="list-group">
-    {% for x in all_article %}
-    <li class="list-group-item">{{x['title']}}</li>
-    {% endfor %}
-</ul>
+<table class="table table-hover">
+    <thead>
+      <tr>
+        <th scope="col">Id</th>
+        <th scope="col">Başlık</th>
+        <th scope="col">Yazar</th>
+        <th scope="col">Tarih</th>
+        <th scope="col"></th>
+        <th scope="col"></th>
+      </tr>
+    </thead>
+    <tbody>
+        {% for x in all_article %}
+        <tr>
+            <th scope="row">{{x.counter}}</th>
+            <td><a href="/articles/{{x.key}}">{{x.title}}</a></td>
+            <td>{{x.author}}</td>
+            <td>{{x.date}}</td>
+            <td><a href="/edit/{{x.key}}" class="btn btn-success">Güncelle</a></td>
+            <td><a href="/delete/{{x.key}}" class="btn btn-danger">Sil</a></td>
+          </tr>
+        {% endfor %}
+    </tbody>
+  </table>
 {% else %}
 <div class="alert alert-danger">Henüz makale bulunmuyor.</div>
 {% endif %}

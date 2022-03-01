@@ -1,3 +1,4 @@
+from itertools import count
 from flask import Flask, render_template, flash, redirect, url_for, session, logging, request, Response, jsonify
 import firebase_admin
 from firebase_admin import credentials, firestore
@@ -46,7 +47,7 @@ def about():
 @app.route("/dashboard", methods=["GET", "POST"])
 @login_required
 def dashboard():
-    article = db.collection("articles").where("user", "==", session["username"])
+    article = db.collection("articles").where("author", "==", session["username"])
     all_article = [doc.to_dict() for doc in article.stream()]    
     return render_template("dashboard.html", all_article=all_article)
 
@@ -116,9 +117,8 @@ def login():
                 else:
                     flash("Şifreniz yanlış...", "danger")
                     return redirect(url_for("login"))
-        else:
-            flash("Böyle bir kullanıcı bulunamadı...", "danger")
-            return redirect(url_for("login"))
+        flash("Böyle bir kullanıcı bulunamadı...", "danger")
+        return redirect(url_for("login"))
 
     return render_template('login.html', error=error)
 
@@ -127,41 +127,20 @@ def login():
 def addarticle():
     if request.method == "POST":
         title = request.form["title"]
-        author = request.form["author"]
+        #author = request.form["author"]
         content = request.form["content"]
         kayityolu = db.collection("articles").document()
         kayityolu.set({
             "title": title,
-            "author": author,
+            "author": session['username'],
             "content": content,
             "key": kayityolu.id,
-            "date": datetime.now(),
-            "user":session['username']
+            "date": datetime.now().strftime("%m/%d/%y")
+            # "user": session['username']
         })
         return redirect(url_for("addarticle"))   
     return render_template("addarticle.html")
 
-
-"""@app.route("/addarticle/<string:key>", methods=["GET", "POST"])
-@login_required
-def addarticle(key):
-    if request.method == "POST":
-        title = request.form["title"]
-        author = request.form["author"]
-        content = request.form["content"]
-        kayityolu = db.collection("users").document(key).collection("articles").document()
-        kayityolu.set({
-            "title": title,
-            "author": author,
-            "content": content,
-            "key": kayityolu.id,
-            "date": datetime.now()
-        })
-        return redirect(url_for("addarticle"))   
-    kayit = db.collection("users").document(key).collection("articles").document().get()
-    gelenveri = [doc.to_dict() for doc in kayit.stream()]
-    return render_template("addarticle.html", gelenveri=gelenveri)
-"""
 
 @app.route("/logout")
 def logout():
