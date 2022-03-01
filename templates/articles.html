@@ -5,7 +5,7 @@
 {% if all_article %}
 <ul class="list-group">
     {% for x in all_article %}
-    <li class="list-group-item">{{x.title}}</li>
+    <li class="list-group-item">{{x['title']}}</li>
     {% endfor %}
   </ul>
 {% else %}

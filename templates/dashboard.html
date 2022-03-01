@@ -3,10 +3,15 @@
 <h3>Kontrol Paneli</h3>
 <p class="light">Hoş geldin, {{session["username"].capitalize()}}</p>
 <hr>
-<!-- <a href="/addarticle"><button type="button" class="btn btn-danger">Makale Ekle</button></a> -->
-<form action="{{url_for('addarticle')}}" method="POST"></form>
-{% for x in gelenveri %}
-<a href="/addarticle/{{x.key}}"><button type="button" class="btn btn-danger">Makale Ekle</button></a>
-{% endfor %}
-</form>
+{% if all_article %}
+<ul class="list-group">
+    {% for x in all_article %}
+    <li class="list-group-item">{{x['title']}}</li>
+    {% endfor %}
+</ul>
+{% else %}
+<div class="alert alert-danger">Henüz makale bulunmuyor.</div>
+{% endif %}
+<hr>
+<a href="/addarticle"><button type="button" class="btn btn-danger">Makale Ekle</button></a>
 {% endblock body %}

@@ -33,7 +33,7 @@ def login_required(f):
     return decorated_function
 
 
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 def index():
     return render_template("index.html")
 
@@ -46,14 +46,20 @@ def about():
 @app.route("/dashboard", methods=["GET", "POST"])
 @login_required
 def dashboard():
-    return render_template("dashboard.html")
+    article = db.collection("articles").where("user", "==", session["username"])
+    all_article = [doc.to_dict() for doc in article.stream()]    
+    return render_template("dashboard.html", all_article=all_article)
 
 
-@app.route("/articles/<string:key>", methods=["GET", "POST"])
+@app.route("/articles", methods=["GET", "POST"])
 @login_required
-def articles(key):  
-    kayit = db.collection("users").document(key).collection("articles").document().get()
-    all_article = [doc.to_dict() for doc in kayit.stream()]
+def articles():
+    #GET  Documentlerin verisini çekmek için kullanılır.
+    #article = db.collection("articles").document(key).get()
+    
+    #Stream Bütün Koleksiyonun verisini çekmek için kullanılır.
+    article = db.collection("articles")
+    all_article = [doc.to_dict() for doc in article.stream()]
     if len(all_article) > 0:
         return render_template("articles.html", all_article=all_article)
     else:
@@ -116,8 +122,27 @@ def login():
 
     return render_template('login.html', error=error)
 
+@app.route("/addarticle", methods=["GET", "POST"])
+@login_required
+def addarticle():
+    if request.method == "POST":
+        title = request.form["title"]
+        author = request.form["author"]
+        content = request.form["content"]
+        kayityolu = db.collection("articles").document()
+        kayityolu.set({
+            "title": title,
+            "author": author,
+            "content": content,
+            "key": kayityolu.id,
+            "date": datetime.now(),
+            "user":session['username']
+        })
+        return redirect(url_for("addarticle"))   
+    return render_template("addarticle.html")
 
-@app.route("/addarticle/<string:key>", methods=["GET", "POST"])
+
+"""@app.route("/addarticle/<string:key>", methods=["GET", "POST"])
 @login_required
 def addarticle(key):
     if request.method == "POST":
@@ -133,10 +158,10 @@ def addarticle(key):
             "date": datetime.now()
         })
         return redirect(url_for("addarticle"))   
-    kayit = db.collection("users").document(key).collection("articles")
+    kayit = db.collection("users").document(key).collection("articles").document().get()
     gelenveri = [doc.to_dict() for doc in kayit.stream()]
     return render_template("addarticle.html", gelenveri=gelenveri)
-
+"""
 
 @app.route("/logout")
 def logout():
