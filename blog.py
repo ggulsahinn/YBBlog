@@ -1,4 +1,6 @@
 from itertools import count
+from types import NoneType
+from anyio import run_async_from_thread
 from flask import Flask, render_template, flash, redirect, url_for, session, logging, request, Response, jsonify
 import firebase_admin
 from firebase_admin import credentials, firestore
@@ -22,6 +24,7 @@ app.config['CKEDITOR_PKG_TYPE'] = 'basic'
 ckeditor = CKEditor(app)
 
 # Kullanıcı Giriş Decorator'ı
+
 
 def login_required(f):
     @wraps(f)
@@ -47,18 +50,24 @@ def about():
 @app.route("/dashboard", methods=["GET", "POST"])
 @login_required
 def dashboard():
-    article = db.collection("articles").where("author", "==", session["username"])
-    all_article = [doc.to_dict() for doc in article.stream()]    
+    article = db.collection("articles").where(
+        "author", "==", session["username"])
+    all_article = [doc.to_dict() for doc in article.stream()]
+
+    # firebaseden date e göre sıralama, son girilen veri en altta
+    def get_name(gelen):
+        return gelen.get('date')
+    all_article.sort(key=get_name, reverse=False)
     return render_template("dashboard.html", all_article=all_article)
 
 
 @app.route("/articles", methods=["GET", "POST"])
 @login_required
 def articles():
-    #GET  Documentlerin verisini çekmek için kullanılır.
+    # GET  Documentlerin verisini çekmek için kullanılır.
     #article = db.collection("articles").document(key).get()
-    
-    #Stream Bütün Koleksiyonun verisini çekmek için kullanılır.
+
+    # Stream Bütün Koleksiyonun verisini çekmek için kullanılır.
     article = db.collection("articles")
     all_article = [doc.to_dict() for doc in article.stream()]
     if len(all_article) > 0:
@@ -122,6 +131,7 @@ def login():
 
     return render_template('login.html', error=error)
 
+
 @app.route("/addarticle", methods=["GET", "POST"])
 @login_required
 def addarticle():
@@ -135,12 +145,17 @@ def addarticle():
             "author": session['username'],
             "content": content,
             "key": kayityolu.id,
-            "date": datetime.now().strftime("%m/%d/%y")
+            "date": datetime.now(),
             # "user": session['username']
         })
-        return redirect(url_for("addarticle"))   
+        return redirect(url_for("addarticle"))
     return render_template("addarticle.html")
 
+
+@app.route("/article/<string:key>")
+def article(key):
+    article = db.collection("articles").document(key).get()
+    return render_template("article.html", article=article)
 
 @app.route("/logout")
 def logout():

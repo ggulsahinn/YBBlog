@@ -1,0 +1,9 @@
+{% extends "layout.html" %}
+{% block body %}
+{% if article %}
+<h4>{{article.to_dict()['title']}}</h4>
+{% else %}
+<div class="alert alert-danger">Henüz makale bulunmuyor.</div>
+{% endif %}
+
+{% endblock body %}

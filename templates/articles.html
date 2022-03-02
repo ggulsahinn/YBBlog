@@ -1,13 +1,18 @@
 {% extends "layout.html" %}
 {% block body %}
 <h3>Makaleler</h3>
-<hr>
 {% if all_article %}
-<ul class="list-group">
+<table class="table table-hover">
+  <tbody>
     {% for x in all_article %}
-    <li class="list-group-item">{{x['title']}}</li>
+    <tr>
+      <ol>
+        <td>{{x.title}}</td>
+      </ol>
+    </tr>
     {% endfor %}
-  </ul>
+  </tbody>
+</table>
 {% else %}
 <div class="alert alert-danger">Henüz makale bulunmuyor.</div>
 {% endif %}

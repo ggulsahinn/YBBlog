@@ -5,29 +5,34 @@
 
 {% if all_article %}
 <table class="table table-hover">
-    <thead>
-      <tr>
-        <th scope="col">Id</th>
-        <th scope="col">Başlık</th>
-        <th scope="col">Yazar</th>
-        <th scope="col">Tarih</th>
-        <th scope="col"></th>
-        <th scope="col"></th>
-      </tr>
-    </thead>
-    <tbody>
-        {% for x in all_article %}
-        <tr>
-            <th scope="row">{{x.counter}}</th>
-            <td><a href="/articles/{{x.key}}">{{x.title}}</a></td>
-            <td>{{x.author}}</td>
-            <td>{{x.date}}</td>
-            <td><a href="/edit/{{x.key}}" class="btn btn-success">Güncelle</a></td>
-            <td><a href="/delete/{{x.key}}" class="btn btn-danger">Sil</a></td>
-          </tr>
-        {% endfor %}
-    </tbody>
-  </table>
+  <thead>
+    <tr>
+      <th scope="col">Id</th>
+      <th scope="col">Başlık</th>
+      <th scope="col">Yazar</th>
+      <th scope="col">İçerik</th>
+      <th scope="col">Tarih</th>
+      <th scope="col"></th>
+      <th scope="col"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    {% for x in all_article %}
+    <tr>
+      <ol>
+        <th scope="row"></th> 
+        <td><a href="/article/{{x.key}}">{{x.title}}</a></td>
+        <td>{{x.author}}</td>
+        <td>{{x.content[:20]|safe}}</td>
+        <td>{{x.date.strftime('%d-%m-%Y')}}</td>
+        <td><a href="/edit/{{x.key}}" class="btn btn-success">Güncelle</a></td>
+        <td><a href="/delete/{{x.key}}" class="btn btn-danger">Sil</a></td>
+      </ol>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
 {% else %}
 <div class="alert alert-danger">Henüz makale bulunmuyor.</div>
 {% endif %}
