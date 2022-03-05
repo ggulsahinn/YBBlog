@@ -50,14 +50,13 @@ def about():
 @app.route("/dashboard", methods=["GET", "POST"])
 @login_required
 def dashboard():
-    article = db.collection("articles").where(
-        "author", "==", session["username"])
+    article = db.collection("articles").where("author", "==", session["username"])
     all_article = [doc.to_dict() for doc in article.stream()]
 
-    # firebaseden date e göre sıralama, son girilen veri en altta
+    # firebaseden date e göre sıralama, son girilen veri en üstte
     def get_name(gelen):
         return gelen.get('date')
-    all_article.sort(key=get_name, reverse=False)
+    all_article.sort(key=get_name, reverse=True)
     return render_template("dashboard.html", all_article=all_article)
 
 
@@ -156,6 +155,7 @@ def addarticle():
 def article(key):
     article = db.collection("articles").document(key).get()
     return render_template("article.html", article=article)
+#http://127.0.0.1:5000/article/fdngkldfg olmayan veri de sayfaya hata mesajı çıksın??????
 
 @app.route("/logout")
 def logout():
