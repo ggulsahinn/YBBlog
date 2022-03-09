@@ -9,7 +9,6 @@
     <tr>
       <th scope="col">Id</th>
       <th scope="col">Başlık</th>
-      <th scope="col">Yazar</th>
       <th scope="col">İçerik</th>
       <th scope="col">Tarih</th>
       <th scope="col"></th>
@@ -23,8 +22,7 @@
       <ol>
         <th scope="row"></th> 
         <td><a href="/article/{{x.key}}">{{x.title}}</a></td>
-        <td>{{x.author}}</td>
-        <td>{{x.content[:20]|safe}}</td>
+        <td>{{x.content[:80]|safe}}...</td>
         <td>{{x.date.strftime('%d-%m-%Y')}}</td>
         <td><a href="/edit/{{x.key}}" class="btn btn-success">Güncelle</a></td>
         <td><a href="/delete/{{x.key}}" class="btn btn-danger">Sil</a></td>
