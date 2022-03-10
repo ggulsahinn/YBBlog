@@ -1,5 +1,6 @@
 from itertools import count
 from types import NoneType
+from typing import Any
 from anyio import run_async_from_thread
 from flask import Flask, render_template, flash, redirect, url_for, session, logging, request, Response, jsonify
 import firebase_admin
@@ -150,12 +151,37 @@ def addarticle():
         return redirect(url_for("addarticle"))
     return render_template("addarticle.html")
 
-
-@app.route("/article/<string:key>")
+@app.route("/article/<string:key>", methods=["GET", "POST"])
+@login_required
 def article(key):
     article = db.collection("articles").document(key).get()
-    return render_template("article.html", article=article)
+    if (article is not None):
+        return render_template("article.html", article=article)
+    else:
+        return render_template("article.html")
 #http://127.0.0.1:5000/article/fdngkldfg olmayan veri de sayfaya hata mesajı çıksın??????
+
+@app.route("/delete/<string:key>")
+@login_required
+def delete(key):
+    db.collection("articles").document(key).delete()
+    return redirect(url_for("dashboard"))
+
+@app.route("/update/<string:key>", methods = ["GET", "POST"])
+@login_required
+def update(key):
+    kayityolu = db.collection("articles").document(key).get()
+    kayityolu2 = db.collection("articles").document(key)
+    if request.method == "POST":
+        title = request.form["title"]
+        content = request.form["content"]
+        kayityolu2.update({
+            "title": title,
+            "content": content,
+            "date": datetime.now()
+        })
+        return redirect(url_for("dashboard"))
+    return render_template("update.html", kayityolu=kayityolu, key=key)
 
 @app.route("/logout")
 def logout():

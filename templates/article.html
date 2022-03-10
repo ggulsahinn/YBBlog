@@ -2,6 +2,12 @@
 {% block body %}
 {% if article %}
 <h4>{{article.to_dict()['title']}}</h4>
+<hr>
+Yazar: {{article.to_dict()['author']}}
+<hr>
+Tarih: {{article.to_dict()['date'].strftime('%d-%m-%Y')}}
+<hr>
+{{article.to_dict()['content']|safe}}
 {% else %}
 <div class="alert alert-danger">Henüz makale bulunmuyor.</div>
 {% endif %}

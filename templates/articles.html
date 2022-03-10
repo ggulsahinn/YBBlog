@@ -7,7 +7,7 @@
     {% for x in all_article %}
     <tr>
       <ol>
-        <td>{{x.title}}</td>
+        <td><a href="article/{{x.key}}">{{x.title}}</a></td>
       </ol>
     </tr>
     {% endfor %}

@@ -22,9 +22,9 @@
       <ol>
         <th scope="row"></th> 
         <td><a href="/article/{{x.key}}">{{x.title}}</a></td>
-        <td>{{x.content[:80]|safe}}...</td>
+        <td>{{x.content[:100]|safe}}</td>
         <td>{{x.date.strftime('%d-%m-%Y')}}</td>
-        <td><a href="/edit/{{x.key}}" class="btn btn-success">Güncelle</a></td>
+        <td><a href="/update/{{x.key}}" class="btn btn-success">Güncelle</a></td>
         <td><a href="/delete/{{x.key}}" class="btn btn-danger">Sil</a></td>
       </ol>
     </tr>

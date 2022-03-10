@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block body %}
+<h3>Makale Güncelle</h3>
+<hr>
+{% from "includes/_formhelpers.html" import render_field %}
+<form action="/update/{{key}}" method="POST">
+    <div class="col-md-12">
+        <div class="form-group mt-3">
+            <label for="validationServer01">Başlık</label>
+            <input type="text" class="form-control" id="validationServer01" placeholder="Başlık" name="title"
+                value="{{kayityolu.to_dict()['title']}}" required>
+        </div>
+        <div class="card-body m-0 p-0">
+            <textarea name="content" id="content">{{kayityolu.to_dict()['content']|safe}}</textarea>
+        </div>
+        <div style="height: 20px;"></div>
+        <button class="btn btn-primary" type="submit">Güncelle</button>
+    </div>
+</form>
+<!-- <script src="https://cdn.ckeditor.com/4.16.1/standard/ckeditor.js"></script> -->
+<script src="//cdn.ckeditor.com/4.16.1/standard/ckeditor.js"></script>
+<script>
+    CKEDITOR.replace('content');
+</script>
+{% endblock body %}
