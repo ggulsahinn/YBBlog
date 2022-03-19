@@ -9,6 +9,7 @@ from datetime import datetime
 from flask_session import Session
 from functools import wraps
 from flask_ckeditor import CKEditor
+from sqlalchemy import null
 
 cred = credentials.Certificate(
     "ybblog-506ca-firebase-adminsdk-rr5mm-4c893a30b7.json")
@@ -155,9 +156,10 @@ def addarticle():
 @login_required
 def article(key):
     article = db.collection("articles").document(key).get()
-    if (article is not None):
+    if (article is not null):
         return render_template("article.html", article=article)
     else:
+        flash("Böyle bir makale bulunamadı","danger")
         return render_template("article.html")
 #http://127.0.0.1:5000/article/fdngkldfg olmayan veri de sayfaya hata mesajı çıksın??????
 
@@ -180,6 +182,7 @@ def update(key):
             "content": content,
             "date": datetime.now()
         })
+        flash("Makale başarıyla güncellendi","success")
         return redirect(url_for("dashboard"))
     return render_template("update.html", kayityolu=kayityolu, key=key)
 
